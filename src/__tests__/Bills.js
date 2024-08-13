@@ -85,14 +85,17 @@ describe('Étant donné que je suis connecté en tant qu\'employé', () => {
     });
 
     test('Alors les factures devraient être ordonnées de la plus ancienne à la plus récente', () => {
+      // Rendre le composant BillsUI avec les données des factures et les ajouter au HTML du document
       document.body.innerHTML = BillsUI({ data: bills });
-
+      // Récupérer toutes les dates affichées par le composant BillsUI
+      // On utilise une expression régulière pour extraire les dates au format YYYY-MM-DD, YYYY/MM/DD, etc.
       const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map((a) => a.innerHTML);
-
+      // Fonction pour comparer deux dates
+      // Convertit les dates en objets Date et les compare
       const chrono = (a, b) => new Date(a) - new Date(b);
-
+      // Trier les dates extraites en utilisant la fonction chrono
       const datesSorted = [...dates].sort(chrono);
-
+      // Vérifier que les dates extraites sont bien triées de la plus ancienne à la plus récente
       expect(dates).toEqual(datesSorted);
     });
   });
@@ -156,14 +159,12 @@ describe('Bills container', () => {
         { id: 1, date: '2024-06-01', status: 'pending' },
         { id: 2, date: '2024-06-02', status: 'paid' }
       ];
-
       // Crée un mock pour la méthode list du store
       const mockStore = {
         bills: () => ({
           list: jest.fn(() => Promise.resolve(mockBills))
         })
       };
-
       // Crée une instance de Bills avec le mockStore
       const billsInstance = new Bills({
         document: document,
@@ -171,13 +172,9 @@ describe('Bills container', () => {
         store: mockStore,
         localStorage: null
       });
-
       // Appelle la méthode getBills de l'instance Bills
       const billsData = await billsInstance.getBills();
-
-
       expect(mockStore.bills().list)
-
       // Vérifie que les données des factures sont formatées correctement
       expect(billsData).toEqual(mockBills.map(bill => ({
         ...bill,

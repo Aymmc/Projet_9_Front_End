@@ -6,7 +6,70 @@ import { ROUTES_PATH } from '../constants/routes.js';
 
 describe("Étant donné que je suis connecté en tant qu'employé", () => {
   describe("Quand je suis sur la page Nouvelle Facture", () => {
-
+    test("Alors le fichier doit être téléversé et les informations de la facture doivent être définies", async () => {
+      // Mock localStorage
+      const mockLocalStorage = {
+        getItem: jest.fn().mockReturnValue(JSON.stringify({ email: "test@example.com" })),
+      };
+      Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
+    
+      // Mock store avec la méthode create de bills
+      const mockCreate = jest.fn().mockResolvedValue({ fileUrl: "http://example.com/file", key: "123" });
+      const mockStore = {
+        bills: jest.fn(() => ({ create: mockCreate })),
+      };
+    
+      // Configurer le DOM avec NewBillUI
+      document.body.innerHTML = NewBillUI();
+      const newBill = new NewBill({
+        document,
+        onNavigate: jest.fn(),
+        store: mockStore,
+        localStorage: window.localStorage,
+      });
+    
+      // Créer un fichier fictif pour le test
+      const file = new File(['dummy content'], 'test.jpg', { type: 'image/jpeg' });
+      
+      // Sélectionner l'input de fichier et déclencher un changement pour simuler le téléversement
+      const fileInput = screen.getByTestId('file');
+      fireEvent.change(fileInput, { target: { files: [file] } });
+    
+      // Soumettre le formulaire est simulé en appelant handleChangeFile
+      // `handleChangeFile` est la méthode qui devrait être appelée lorsque le fichier est sélectionné
+      const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e));
+      fileInput.addEventListener('change', handleChangeFile);
+      fireEvent.change(fileInput, { target: { files: [file] } });
+    
+      // Attendre que toutes les promesses soient résolues pour s'assurer que `mockCreate` est appelé
+      await new Promise(process.nextTick);
+    
+      // Assertions
+      // Vérifie que la méthode handleChangeFile a été appelée
+      expect(handleChangeFile).toHaveBeenCalled();
+    
+      // Vérifie que la méthode create du store a été appelée avec les bons arguments
+      // Cela teste directement l'appel POST à l'API pour créer une facture
+      expect(mockCreate).toHaveBeenCalledWith({
+        data: expect.any(FormData), // Vérifie que les données envoyées sont de type FormData
+        headers: { noContentType: true } // Vérifie que les en-têtes sont corrects
+      });
+    
+      // Récupère le FormData à partir des appels mockés de la méthode create
+      const formData = mockCreate.mock.calls[0][0].data;
+      
+      // Vérifie que le FormData contient le fichier correct
+      expect(formData.get('file')).toEqual(file);
+      
+      // Vérifie que le FormData contient l'email de l'utilisateur
+      expect(formData.get('email')).toEqual("test@example.com");
+      
+      // Vérifie que les propriétés de la facture sont définies correctement après l'appel POST
+      expect(newBill.billId).toBe("123");
+      expect(newBill.fileUrl).toBe("http://example.com/file");
+      expect(newBill.fileName).toBe("test.jpg");
+    });
+    
     test("Alors la validation de l'extension du fichier doit fonctionner lorsque l'extension du fichier n'est pas autorisée", () => {
       // Crée une instance de NewBill avec les mocks appropriés
       const mockLocalStorage = {
@@ -55,6 +118,9 @@ describe("Étant donné que je suis connecté en tant qu'employé", () => {
         bills: jest.fn(() => ({ create: mockCreate })),
       };
 
+      // Espionner sur console.error
+      const consoleErrorSpy = jest.spyOn(console, 'error');
+
       // Configurer le DOM avec NewBillUI
       document.body.innerHTML = NewBillUI();
       const newBill = new NewBill({
@@ -90,6 +156,9 @@ describe("Étant donné que je suis connecté en tant qu'employé", () => {
       expect(newBill.billId).toBe("123");
       expect(newBill.fileUrl).toBe("http://example.com/file");
       expect(newBill.fileName).toBe("test.jpg");
+
+      // Vérifier que console.error n'est pas appelé
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
     });
 
     test("Alors le formulaire doit être soumis avec les données correctes", () => {
@@ -206,3 +275,4 @@ describe("Étant donné que je suis connecté en tant qu'employé", () => {
     });
   });
 });
+
