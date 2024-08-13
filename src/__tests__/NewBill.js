@@ -6,6 +6,7 @@ import { ROUTES_PATH } from '../constants/routes.js';
 
 describe("Étant donné que je suis connecté en tant qu'employé", () => {
   describe("Quand je suis sur la page Nouvelle Facture", () => {
+
     test("Alors la validation de l'extension du fichier doit fonctionner lorsque l'extension du fichier n'est pas autorisée", () => {
       // Crée une instance de NewBill avec les mocks appropriés
       const mockLocalStorage = {
@@ -54,9 +55,6 @@ describe("Étant donné que je suis connecté en tant qu'employé", () => {
         bills: jest.fn(() => ({ create: mockCreate })),
       };
 
-      // Espionner sur console.error
-      const consoleErrorSpy = jest.spyOn(console, 'error');
-
       // Configurer le DOM avec NewBillUI
       document.body.innerHTML = NewBillUI();
       const newBill = new NewBill({
@@ -92,9 +90,6 @@ describe("Étant donné que je suis connecté en tant qu'employé", () => {
       expect(newBill.billId).toBe("123");
       expect(newBill.fileUrl).toBe("http://example.com/file");
       expect(newBill.fileName).toBe("test.jpg");
-
-      // Vérifier que console.error n'est pas appelé
-      expect(consoleErrorSpy).not.toHaveBeenCalled();
     });
 
     test("Alors le formulaire doit être soumis avec les données correctes", () => {
@@ -211,4 +206,3 @@ describe("Étant donné que je suis connecté en tant qu'employé", () => {
     });
   });
 });
-

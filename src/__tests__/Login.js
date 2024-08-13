@@ -7,29 +7,32 @@ import Login from "../containers/Login.js";
 import { ROUTES } from "../constants/routes";
 import { fireEvent, screen } from "@testing-library/dom";
 
-describe("Given that I am a user on the login page", () => {
+describe("Étant donné que je suis un utilisateur sur la page de connexion", () => {
 
   // Lorsque je ne remplis pas les champs et que je clique sur le bouton de connexion employé
-  describe("When I do not fill fields and I click on the employee Login In button", () => {
-
-    test("Then the login page should be rendered", () => {
+  describe("Lorsque je ne remplis pas les champs et que je clique sur le bouton de connexion employé", () => {
+    test("Alors, la page de connexion doit être rendue", () => {
       document.body.innerHTML = LoginUI();
 
+      // Sélectionner le formulaire de connexion employé
       const form = screen.getByTestId("form-employee");
       const handleSubmit = jest.fn((e) => e.preventDefault());
       form.addEventListener("submit", handleSubmit);
 
+      // Soumettre le formulaire sans remplir les champs
       fireEvent.submit(form);
 
+      // Vérifier que le formulaire est toujours affiché
       expect(screen.getByTestId("form-employee")).toBeTruthy();
     });
   });
 
   // Lorsque je remplis les champs avec un format incorrect et que je clique sur le bouton de connexion employé
-  describe("When I fill fields in incorrect format and click on the employee Login In button", () => {
-    test("Then the login page should be rendered", () => {
+  describe("Lorsque je remplis les champs avec un format incorrect et que je clique sur le bouton de connexion employé", () => {
+    test("Alors, la page de connexion doit être rendue", () => {
       document.body.innerHTML = LoginUI();
 
+      // Remplir les champs avec des valeurs incorrectes
       const inputEmailUser = screen.getByTestId("employee-email-input");
       fireEvent.change(inputEmailUser, { target: { value: "invalidemail" } });
 
@@ -40,16 +43,18 @@ describe("Given that I am a user on the login page", () => {
       const handleSubmit = jest.fn((e) => e.preventDefault());
       form.addEventListener("submit", handleSubmit);
 
+      // Soumettre le formulaire avec des valeurs incorrectes
       fireEvent.submit(form);
 
+      // Vérifier que le formulaire est toujours affiché
       expect(screen.getByTestId("form-employee")).toBeTruthy();
     });
   });
 
   // Lorsque je remplis les champs avec un format correct et que je clique sur le bouton de connexion employé
-  describe("Given that I am a user on the login page", () => {
-    test("When I fill fields in correct format and click on the employee Login In button", async () => {
-      // Nettoyer et initialiser l'interface utilisateur du login
+  describe("Étant donné que je suis un utilisateur sur la page de connexion", () => {
+    test("Lorsque je remplis les champs avec un format correct et que je clique sur le bouton de connexion employé", async () => {
+      // Nettoyer et initialiser l'interface utilisateur de la connexion
       document.body.innerHTML = LoginUI();
     
       // Définir les données d'entrée pour l'utilisateur
@@ -113,12 +118,12 @@ describe("Given that I am a user on the login page", () => {
         })
       );
     });
-    
   });
   
-  describe("Given that I am a user on the login page", () => {
-    test("When I fill fields in correct format and click on the admin Login In button", async () => {
-      // Nettoyer et initialiser l'interface utilisateur du login
+  // Lorsque je remplis les champs avec un format correct et que je clique sur le bouton de connexion administrateur
+  describe("Étant donné que je suis un utilisateur sur la page de connexion", () => {
+    test("Lorsque je remplis les champs avec un format correct et que je clique sur le bouton de connexion administrateur", async () => {
+      // Nettoyer et initialiser l'interface utilisateur de la connexion
       document.body.innerHTML = LoginUI();
     
       // Définir les données d'entrée pour l'administrateur
@@ -183,7 +188,4 @@ describe("Given that I am a user on the login page", () => {
       );
     });
   });
-  
-  
-  
-  });
+});
